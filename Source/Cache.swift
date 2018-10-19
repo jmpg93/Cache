@@ -13,7 +13,7 @@ protocol CacheDelegate: class {
 	func cache<Key: Hashable, Value>(_ cache: Cache<Key, Value>, willEvictValue value: Value)
 }
 
-class Cache<Key: Hashable, Value>: NSObject, NSCacheDelegate, ExpressibleByDictionaryLiteral {
+open class Cache<Key: Hashable, Value>: NSObject, NSCacheDelegate, ExpressibleByDictionaryLiteral {
 	private typealias KeyBox = Cache.Box<Key>
 	private typealias ValueBox = Cache.Box<Value>
 
@@ -38,7 +38,7 @@ class Cache<Key: Hashable, Value>: NSObject, NSCacheDelegate, ExpressibleByDicti
 		}
 	}
 
-	private var keys: Set<Key> = []
+	private (set)var keys: Set<Key> = []
 	private lazy var cache = NSCache<KeyBox, ValueBox>(delegate: self)
 
 	weak open var delegate: CacheDelegate?
@@ -87,8 +87,7 @@ extension Cache {
 	}
 
 	open func removeAll() {
-		keys.removeAll()
-		cache.removeAllObjects()
+		keys.forEach(remove)
 	}
 
 	open subscript(key: Key, cost: Int) -> Value? {
